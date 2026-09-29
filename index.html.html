@@ -1,0 +1,895 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Beyond the Prompt</title>
+    
+    <!-- Google Fonts: Poppins -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        navy: {
+                            DEFAULT: '#1B2437',
+                            light: '#2a364f',
+                        },
+                        lightbg: '#F8FAFC',
+                        brand: {
+                            green: '#dcfce7',
+                            greenText: '#166534',
+                            blue: '#dbeafe',
+                            blueText: '#1e40af',
+                            purple: '#f3e8ff',
+                            purpleText: '#6b21a8'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Poppins', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        /* Custom Styles for Slider */
+        input[type=range] {
+            -webkit-appearance: none;
+            width: 100%;
+            background: transparent;
+        }
+        input[type=range]:focus { outline: none; }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 24px;
+            width: 24px;
+            border-radius: 50%;
+            background: #1B2437;
+            cursor: pointer;
+            margin-top: -10px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+            border: 2px solid white;
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 6px;
+            cursor: pointer;
+            background: #cbd5e1;
+            border-radius: 3px;
+        }
+
+        /* Smooth transitions for tabs */
+        .tab-content { animation: fadeIn 0.3s ease-in-out; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Expandable Card Transition */
+        .card-expanded-content {
+            transition: all 0.3s ease-in-out;
+            max-height: 0;
+            overflow: hidden;
+            opacity: 0;
+        }
+        
+        .card-expanded-content.active {
+            max-height: 500px;
+            opacity: 1;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid #e2e8f0;
+        }
+    </style>
+</head>
+<body class="flex h-screen w-full bg-lightbg text-slate-800 font-sans overflow-hidden antialiased">
+
+    <aside class="w-64 bg-navy text-white flex flex-col flex-shrink-0 h-full overflow-y-auto relative z-20 shadow-2xl">
+        <!-- Logo Area -->
+        <div class="p-8 flex flex-col items-center">
+            <!-- Using the exact provided filename and rounded-full clipping -->
+            <img src="beyond-logo-v4.png" alt="Beyond the Prompt Logo" class="w-24 h-24 rounded-full object-cover border-2 border-white/20 shadow-lg hover:scale-105 transition-transform">
+        </div>
+
+        <!-- Navigation Links -->
+        <nav class="flex-1 px-4 py-2 space-y-2">
+            <button data-target="home" class="nav-link active w-full flex items-center gap-4 px-5 py-3.5 rounded-full bg-white text-navy font-bold shadow-md transition-all">
+                <i class="fa-solid fa-house w-5 text-center text-lg"></i> Home
+            </button>
+            <button data-target="information" class="nav-link w-full flex items-center gap-4 px-5 py-3.5 rounded-full text-slate-300 hover:text-white hover:bg-white/10 font-semibold transition-all">
+                <i class="fa-solid fa-book-open w-5 text-center text-lg"></i> Information
+            </button>
+            <button data-target="articles" class="nav-link w-full flex items-center gap-4 px-5 py-3.5 rounded-full text-slate-300 hover:text-white hover:bg-white/10 font-semibold transition-all">
+                <i class="fa-regular fa-newspaper w-5 text-center text-lg"></i> Articles
+            </button>
+            <button data-target="workshops" class="nav-link w-full flex items-center gap-4 px-5 py-3.5 rounded-full text-slate-300 hover:text-white hover:bg-white/10 font-semibold transition-all">
+                <i class="fa-solid fa-laptop-code w-5 text-center text-lg"></i> Workshops
+            </button>
+            <button data-target="events" class="nav-link w-full flex items-center gap-4 px-5 py-3.5 rounded-full text-slate-300 hover:text-white hover:bg-white/10 font-semibold transition-all">
+                <i class="fa-regular fa-calendar w-5 text-center text-lg"></i> Events
+            </button>
+            <button data-target="about" class="nav-link w-full flex items-center gap-4 px-5 py-3.5 rounded-full text-slate-300 hover:text-white hover:bg-white/10 font-semibold transition-all">
+                <i class="fa-solid fa-user-group w-5 text-center text-lg"></i> About Us
+            </button>
+        </nav>
+    </aside>
+
+    <main class="flex-1 h-full overflow-y-auto relative scroll-smooth bg-lightbg pb-24">
+        
+        <!-- ========================================== -->
+        <!-- TAB 1: HOME -->
+        <!-- ========================================== -->
+        <section id="home" class="tab-content block min-h-full">
+            <!-- 1. Hero Section -->
+            <div class="px-12 pt-24 pb-16 flex flex-col items-start gap-12 max-w-5xl mx-auto relative">
+                <div class="z-10 w-full">
+                    <span class="inline-flex items-center gap-2 px-4 py-1.5 bg-white border border-slate-200 text-slate-600 rounded-full text-[10px] font-bold tracking-widest uppercase mb-8 shadow-sm">
+                        <i class="fa-solid fa-wand-magic-sparkles text-slate-400"></i> A Youth Driven Program
+                    </span>
+                    <h1 class="text-5xl lg:text-7xl font-extrabold text-navy leading-[1.05] mb-6 tracking-tight">
+                        AI literacy for<br>today's students.<br>
+                        Built <span class="text-slate-500 italic font-medium">by students.</span>
+                    </h1>
+                    <p class="text-lg text-slate-600 mb-10 max-w-xl leading-relaxed">
+                        We help students understand AI, use it responsibly, and shape its growing role in education — through friendly articles, workshops, and community events.
+                    </p>
+                    <div class="flex flex-wrap gap-4 mb-12">
+                        <button class="bg-navy hover:bg-navy-light text-white px-8 py-4 rounded-full font-bold transition shadow-lg text-sm">
+                            Explore our resources <i class="fa-solid fa-arrow-right ml-2"></i>
+                        </button>
+                        <button class="bg-white hover:bg-slate-50 text-navy px-8 py-4 rounded-full font-bold transition shadow-md border border-slate-200 text-sm">
+                            Join our community
+                        </button>
+                    </div>
+                    
+                    <!-- Stats -->
+                    <div class="flex items-center gap-10 text-sm font-medium pt-8 border-t border-slate-200 w-full max-w-2xl mt-8">
+                        <div><span class="text-2xl font-extrabold text-navy block mb-1">2.4K+</span><span class="text-slate-400 text-xs tracking-wide uppercase">students reached</span></div>
+                        <div><span class="text-2xl font-extrabold text-navy block mb-1">40+</span><span class="text-slate-400 text-xs tracking-wide uppercase">workshops hosted</span></div>
+                        <div><span class="text-2xl font-extrabold text-navy block mb-1">18</span><span class="text-slate-400 text-xs tracking-wide uppercase">partner schools</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. Why it matters Section -->
+            <div class="px-12 py-24 max-w-7xl mx-auto border-t border-slate-100">
+                <h2 class="text-[10px] font-bold tracking-widest text-slate-400 uppercase mb-4 bg-slate-100 inline-block px-3 py-1 rounded">WHY IT MATTERS</h2>
+                <h3 class="text-4xl font-extrabold text-navy mb-12">AI is shaping our world.<br>Literacy helps us shape it <span class="italic font-medium text-green-700">responsibly.</span></h3>
+                
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                    <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-100 hover:shadow-md transition">
+                        <div class="w-12 h-12 bg-slate-50 rounded-2xl flex items-center justify-center text-navy mb-6 text-xl border border-slate-100"><i class="fa-solid fa-brain"></i></div>
+                        <h4 class="font-bold text-navy text-lg mb-3">Understand</h4>
+                        <p class="text-slate-500 text-sm leading-relaxed">Build confidence in how AI actually works.</p>
+                    </div>
+                    <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-100 hover:shadow-md transition">
+                        <div class="w-12 h-12 bg-green-50 rounded-2xl flex items-center justify-center text-green-700 mb-6 text-xl border border-green-100"><i class="fa-solid fa-shield-halved"></i></div>
+                        <h4 class="font-bold text-navy text-lg mb-3">Use responsibly</h4>
+                        <p class="text-slate-500 text-sm leading-relaxed">Learn ethics, privacy, and digital citizenship.</p>
+                    </div>
+                    <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-100 hover:shadow-md transition">
+                        <div class="w-12 h-12 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-700 mb-6 text-xl border border-blue-100"><i class="fa-regular fa-lightbulb"></i></div>
+                        <h4 class="font-bold text-navy text-lg mb-3">Think critically</h4>
+                        <p class="text-slate-500 text-sm leading-relaxed">Question, evaluate, and stay informed.</p>
+                    </div>
+                    <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-100 relative overflow-hidden hover:shadow-md transition">
+                        <div class="w-12 h-12 bg-orange-50 rounded-2xl flex items-center justify-center text-orange-600 mb-6 text-xl border border-orange-100"><i class="fa-solid fa-arrow-pointer"></i></div>
+                        <h4 class="font-bold text-navy text-lg mb-3">Create impact</h4>
+                        <p class="text-slate-500 text-sm leading-relaxed">Use AI to make a positive difference.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. Resources Section -->
+            <div class="px-12 py-16 max-w-7xl mx-auto relative border-t border-slate-100">
+                <h2 class="text-[10px] font-bold tracking-widest text-slate-400 uppercase mb-4 bg-slate-100 inline-block px-3 py-1 rounded relative z-10">LEARN & EXPLORE</h2>
+                <h3 class="text-4xl font-extrabold text-navy mb-8 relative z-10">Resources to spark curiosity and<br><span class="italic font-medium text-slate-500">build skills.</span></h3>
+                
+                <div class="flex gap-2 mb-10 relative z-10">
+                    <button class="bg-navy text-white px-5 py-2 rounded-full text-xs font-bold shadow">All</button>
+                    <button class="bg-white border border-slate-200 text-slate-600 px-5 py-2 rounded-full text-xs font-bold hover:bg-slate-50 transition">Guide</button>
+                    <button class="bg-white border border-slate-200 text-slate-600 px-5 py-2 rounded-full text-xs font-bold hover:bg-slate-50 transition">Video</button>
+                    <button class="bg-white border border-slate-200 text-slate-600 px-5 py-2 rounded-full text-xs font-bold hover:bg-slate-50 transition">Activity</button>
+                    <button class="bg-white border border-slate-200 text-slate-600 px-5 py-2 rounded-full text-xs font-bold hover:bg-slate-50 transition">Tool</button>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 relative z-10">
+                    <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-100 flex flex-col h-full cursor-pointer hover:-translate-y-1 hover:shadow-md transition-all group">
+                        <div class="w-12 h-12 bg-slate-50 rounded-2xl flex items-center justify-center text-slate-600 mb-6 text-xl border border-slate-100">
+                            <i class="fa-solid fa-book-open"></i>
+                        </div>
+                        <h4 class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">GUIDE</h4>
+                        <h5 class="text-xl font-bold text-navy mb-3 group-hover:text-blue-600 transition-colors">What is AI, Really?</h5>
+                        <p class="text-sm text-slate-500 mb-6 flex-grow">A beginner-friendly guide to understanding the basics.</p>
+                        <i class="fa-solid fa-arrow-right text-slate-400 group-hover:text-blue-600 transition-colors"></i>
+                    </div>
+                    <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-100 flex flex-col h-full cursor-pointer hover:-translate-y-1 hover:shadow-md transition-all group">
+                        <div class="w-12 h-12 bg-slate-50 rounded-2xl flex items-center justify-center text-slate-600 mb-6 text-xl border border-slate-100">
+                            <i class="fa-solid fa-play"></i>
+                        </div>
+                        <h4 class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">VIDEO</h4>
+                        <h5 class="text-xl font-bold text-navy mb-3 group-hover:text-blue-600 transition-colors">AI in Everyday Life</h5>
+                        <p class="text-sm text-slate-500 mb-6 flex-grow">Explore how AI shows up in your world (spoiler: everywhere).</p>
+                        <i class="fa-solid fa-arrow-right text-slate-400 group-hover:text-blue-600 transition-colors"></i>
+                    </div>
+                    <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-100 flex flex-col h-full cursor-pointer hover:-translate-y-1 hover:shadow-md transition-all group">
+                        <div class="w-12 h-12 bg-slate-50 rounded-2xl flex items-center justify-center text-slate-600 mb-6 text-xl border border-slate-100">
+                            <i class="fa-solid fa-puzzle-piece"></i>
+                        </div>
+                        <h4 class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">ACTIVITY</h4>
+                        <h5 class="text-xl font-bold text-navy mb-3 group-hover:text-blue-600 transition-colors">Test Your AI IQ</h5>
+                        <p class="text-sm text-slate-500 mb-6 flex-grow">Interactive quiz to test your knowledge and bust myths.</p>
+                        <i class="fa-solid fa-arrow-right text-slate-400 group-hover:text-blue-600 transition-colors"></i>
+                    </div>
+                    <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-100 flex flex-col h-full cursor-pointer hover:-translate-y-1 hover:shadow-md transition-all group">
+                        <div class="w-12 h-12 bg-slate-50 rounded-2xl flex items-center justify-center text-slate-600 mb-6 text-xl border border-slate-100">
+                            <i class="fa-solid fa-wand-magic-sparkles"></i>
+                        </div>
+                        <h4 class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">TOOL</h4>
+                        <h5 class="text-xl font-bold text-navy mb-3 group-hover:text-blue-600 transition-colors">Prompt Playground</h5>
+                        <p class="text-sm text-slate-500 mb-6 flex-grow">Experiment with prompts and see the magic happen.</p>
+                        <i class="fa-solid fa-arrow-right text-slate-400 group-hover:text-blue-600 transition-colors"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4. Community Initiatives Timeline -->
+            <div class="px-12 py-24 max-w-7xl mx-auto relative overflow-hidden border-t border-slate-100">
+                <div class="flex flex-col lg:flex-row gap-12 items-end mb-16 relative z-10">
+                    <div class="flex-1">
+                        <h2 class="text-[10px] font-bold tracking-widest text-slate-400 uppercase mb-4 bg-slate-100 inline-block px-3 py-1 rounded">COMMUNITY INITIATIVES</h2>
+                        <h3 class="text-4xl font-extrabold text-navy mb-4">Student-led. Impact-driven.</h3>
+                        <p class="text-slate-500 max-w-xl">We create programs and projects that give students the opportunity to lead, collaborate, and make a difference.</p>
+                    </div>
+                </div>
+                
+                <div class="relative pt-8">
+                    <!-- Timeline horizontal line -->
+                    <div class="absolute top-[28px] left-8 right-8 h-0.5 bg-slate-200"></div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-8 relative z-10">
+                        <div class="flex flex-col items-start space-y-4">
+                            <div class="w-14 h-14 bg-white border border-slate-200 rounded-full flex items-center justify-center text-slate-400 shadow-sm z-10"><i class="fa-solid fa-handshake-angle"></i></div>
+                            <h4 class="text-lg font-bold text-navy mt-2">Peer Educator Program</h4>
+                            <p class="text-sm text-slate-500">Students teach students and build confidence together.</p>
+                            <span class="text-green-700 font-bold text-[10px] uppercase tracking-widest">2022</span>
+                        </div>
+                        <div class="flex flex-col items-start space-y-4">
+                            <div class="w-14 h-14 bg-green-700 border border-green-800 rounded-full flex items-center justify-center text-white shadow-md z-10"><i class="fa-solid fa-leaf"></i></div>
+                            <h4 class="text-lg font-bold text-navy mt-2">AI for Good Projects</h4>
+                            <p class="text-sm text-slate-500">Tackling real-world problems with AI solutions.</p>
+                            <span class="text-green-700 font-bold text-[10px] uppercase tracking-widest">2023</span>
+                        </div>
+                        <div class="flex flex-col items-start space-y-4">
+                            <div class="w-14 h-14 bg-white border border-slate-200 rounded-full flex items-center justify-center text-slate-400 shadow-sm z-10"><i class="fa-solid fa-school"></i></div>
+                            <h4 class="text-lg font-bold text-navy mt-2">School Partnerships</h4>
+                            <p class="text-sm text-slate-500">Bringing AI literacy workshops to classrooms.</p>
+                            <span class="text-green-700 font-bold text-[10px] uppercase tracking-widest">2024</span>
+                        </div>
+                        <div class="flex flex-col items-start space-y-4">
+                            <div class="w-14 h-14 bg-white border border-slate-200 rounded-full flex items-center justify-center text-slate-400 shadow-sm z-10"><i class="fa-solid fa-bullhorn"></i></div>
+                            <h4 class="text-lg font-bold text-navy mt-2">Youth Voices in AI</h4>
+                            <p class="text-sm text-slate-500">Creating space for student perspectives and leadership.</p>
+                            <span class="text-green-700 font-bold text-[10px] uppercase tracking-widest">Today</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 5. Poke at AI Section -->
+            <div class="px-12 py-16 max-w-7xl mx-auto relative bg-white/50 rounded-3xl my-12 border border-slate-100 shadow-sm">
+                 <h2 class="text-[10px] font-bold tracking-widest text-slate-400 uppercase mb-3 bg-slate-100 inline-block px-3 py-1 rounded">TEST YOUR INSTINCTS</h2>
+                 <h3 class="text-4xl font-extrabold text-navy mb-12">Poke at AI. <span class="italic font-medium text-slate-500">See what's real.</span></h3>
+                 
+                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
+                     <!-- Myth vs Fact Mini-Card -->
+                     <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-100 relative">
+                         <div class="flex justify-between items-center mb-6">
+                            <h4 class="text-[10px] font-bold tracking-widest text-slate-400 uppercase">MYTH VS. FACT</h4>
+                            <div class="flex gap-1">
+                                <div class="w-6 h-2 bg-navy rounded-full"></div>
+                                <div class="w-2 h-2 bg-slate-200 rounded-full"></div>
+                                <div class="w-2 h-2 bg-slate-200 rounded-full"></div>
+                            </div>
+                         </div>
+                         <div class="bg-navy text-white rounded-2xl p-6 mb-4 shadow-md">
+                             <p class="text-[10px] font-bold uppercase tracking-widest mb-2 text-slate-300">MYTH</p>
+                             <p class="text-xl font-bold">AI is always right.</p>
+                         </div>
+                         <div class="bg-green-50 text-green-800 rounded-2xl p-6 mb-8 border border-green-100">
+                             <p class="text-[10px] font-bold uppercase tracking-widest mb-2 text-green-600/70">FACT</p>
+                             <button class="bg-white px-4 py-2 rounded-full text-xs font-bold text-slate-600 shadow-sm border border-slate-200 hover:bg-slate-50 transition">Tap to reveal the fact</button>
+                         </div>
+                         <div class="flex justify-end gap-3">
+                             <button class="bg-slate-100 text-slate-500 px-6 py-2.5 rounded-full text-sm font-bold hover:bg-slate-200 transition">Previous</button>
+                             <button class="bg-navy text-white px-6 py-2.5 rounded-full text-sm font-bold hover:bg-navy-light transition shadow">Next myth</button>
+                         </div>
+                     </div>
+
+                     <!-- Scenario Mini-Card -->
+                     <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-100 relative">
+                         <h4 class="text-[10px] font-bold tracking-widest text-slate-400 uppercase mb-4">SCENARIO • CHOOSE WISELY</h4>
+                         <p class="font-bold text-navy text-2xl mb-8 leading-snug">Your teacher assigned an essay on climate change. What's a responsible use of AI?</p>
+                         <div class="space-y-4">
+                            <label class="flex items-center p-4 border border-slate-200 rounded-full hover:border-navy cursor-pointer transition-colors group">
+                                <span class="text-slate-600 font-medium text-sm group-hover:text-navy px-2">Ask AI to write the whole essay and submit it.</span>
+                            </label>
+                            <label class="flex items-center p-4 border border-navy shadow-sm rounded-full cursor-pointer transition-colors bg-slate-50 group">
+                                <span class="text-navy font-bold text-sm px-2">Use AI to brainstorm angles, write and cite your own sources.</span>
+                            </label>
+                            <label class="flex items-center p-4 border border-slate-200 rounded-full hover:border-navy cursor-pointer transition-colors group">
+                                <span class="text-slate-600 font-medium text-sm group-hover:text-navy px-2">Copy AI's answer and change a few words.</span>
+                            </label>
+                         </div>
+                     </div>
+                 </div>
+            </div>
+
+            <!-- 6. Upcoming Split Section -->
+            <div class="px-12 py-16 max-w-7xl mx-auto grid grid-cols-1 xl:grid-cols-2 gap-16 relative">
+                <!-- Left: Workshops -->
+                <div class="relative border-r-0 xl:border-r border-slate-200 xl:pr-12">
+                    <h2 class="text-[10px] font-bold tracking-widest text-slate-400 uppercase mb-3 bg-slate-100 inline-block px-3 py-1 rounded">UPCOMING WORKSHOPS</h2>
+                    <h3 class="text-3xl font-extrabold text-navy mb-8">Hands-on learning. Real connections.</h3>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 relative z-10">
+                        <div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-100 flex flex-col h-full hover:shadow-md transition">
+                            <div class="flex items-center gap-2 mb-4">
+                                <span class="bg-green-50 text-green-700 px-3 py-1 rounded border border-green-100 text-[10px] font-bold tracking-wider"><i class="fa-regular fa-clock"></i> 45 min</span>
+                            </div>
+                            <h4 class="text-xl font-bold text-navy mb-2">Prompting 101</h4>
+                            <p class="text-sm text-slate-500 mb-6 flex-grow">The anatomy of a great prompt, plus five patterns you'll use forever.</p>
+                            <span class="text-green-700 text-xs font-bold uppercase tracking-widest">Beginner</span>
+                        </div>
+                        <div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-100 flex flex-col h-full hover:shadow-md transition">
+                            <div class="flex items-center gap-2 mb-4">
+                                <span class="bg-green-50 text-green-700 px-3 py-1 rounded border border-green-100 text-[10px] font-bold tracking-wider"><i class="fa-regular fa-clock"></i> 60 min</span>
+                            </div>
+                            <h4 class="text-xl font-bold text-navy mb-2">Spotting AI Hallucinations</h4>
+                            <p class="text-sm text-slate-500 mb-6 flex-grow">Practice catching confident nonsense with real examples from popular models.</p>
+                            <span class="text-green-700 text-xs font-bold uppercase tracking-widest">Intermediate</span>
+                        </div>
+                        <div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-100 flex flex-col h-full hover:shadow-md transition">
+                            <div class="flex items-center gap-2 mb-4">
+                                <span class="bg-green-50 text-green-700 px-3 py-1 rounded border border-green-100 text-[10px] font-bold tracking-wider"><i class="fa-regular fa-clock"></i> 50 min</span>
+                            </div>
+                            <h4 class="text-xl font-bold text-navy mb-2">AI & Academic Integrity</h4>
+                            <p class="text-sm text-slate-500 mb-6 flex-grow">A discussion-based session with scenarios, role-play, and a personal ethics policy.</p>
+                            <span class="text-green-700 text-xs font-bold uppercase tracking-widest">All levels</span>
+                        </div>
+                        <div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-100 flex flex-col h-full hover:shadow-md transition">
+                            <div class="flex items-center gap-2 mb-4">
+                                <span class="bg-green-50 text-green-700 px-3 py-1 rounded border border-green-100 text-[10px] font-bold tracking-wider"><i class="fa-regular fa-clock"></i> 90 min</span>
+                            </div>
+                            <h4 class="text-xl font-bold text-navy mb-2">Build a Study Buddy</h4>
+                            <p class="text-sm text-slate-500 mb-6 flex-grow">Design your own AI study assistant — no code required.</p>
+                            <span class="text-green-700 text-xs font-bold uppercase tracking-widest">Intermediate</span>
+                        </div>
+                    </div>
+                    <div class="mt-6 font-bold text-sm text-navy flex items-center gap-2 cursor-pointer z-10 relative">View all workshops <i class="fa-solid fa-arrow-right"></i></div>
+                </div>
+
+                <!-- Right: Events -->
+                <div class="xl:pl-8">
+                    <h2 class="text-[10px] font-bold tracking-widest text-slate-400 uppercase mb-3 bg-slate-100 inline-block px-3 py-1 rounded">UPCOMING EVENTS</h2>
+                    <h3 class="text-3xl font-extrabold text-navy mb-8">Be part of something <span class="italic font-medium text-slate-500">bigger.</span></h3>
+                    
+                    <div class="space-y-4">
+                        <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 flex gap-6 items-center hover:shadow-md transition cursor-pointer">
+                            <div class="bg-slate-100 text-navy font-bold rounded-full w-14 h-14 flex flex-col items-center justify-center flex-shrink-0 leading-tight">
+                                <span class="text-[10px] uppercase">SEP</span>
+                                <span class="text-lg">12</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-navy text-lg mb-1">Beyond the Prompt Launch Night</h4>
+                                <p class="text-sm text-slate-500 mb-1">Founders' story, live demo, community Q&A.</p>
+                                <p class="text-xs text-slate-400"><i class="fa-solid fa-location-dot"></i> Online</p>
+                            </div>
+                        </div>
+                        <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 flex gap-6 items-center hover:shadow-md transition cursor-pointer">
+                            <div class="bg-slate-100 text-navy font-bold rounded-full w-14 h-14 flex flex-col items-center justify-center flex-shrink-0 leading-tight">
+                                <span class="text-[10px] uppercase">OCT</span>
+                                <span class="text-lg">04</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-navy text-lg mb-1">AI Ethics Roundtable</h4>
+                                <p class="text-sm text-slate-500 mb-1">Students, teachers, and researchers unpack real classroom...</p>
+                                <p class="text-xs text-slate-400"><i class="fa-solid fa-location-dot"></i> London</p>
+                            </div>
+                        </div>
+                        <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 flex gap-6 items-center hover:shadow-md transition cursor-pointer">
+                            <div class="bg-slate-100 text-navy font-bold rounded-full w-14 h-14 flex flex-col items-center justify-center flex-shrink-0 leading-tight">
+                                <span class="text-[10px] uppercase">NOV</span>
+                                <span class="text-lg">18</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-navy text-lg mb-1">Student AI Hackathon</h4>
+                                <p class="text-sm text-slate-500 mb-1">48 hours to prototype a learning tool. Prizes, mentors, snacks.</p>
+                                <p class="text-xs text-slate-400"><i class="fa-solid fa-location-dot"></i> Hybrid</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-6 font-bold text-sm text-navy flex items-center gap-2 cursor-pointer">View all events <i class="fa-solid fa-arrow-right"></i></div>
+                </div>
+            </div>
+
+            <!-- 7. Join the Movement Dark Banner -->
+            <div class="px-12 pb-24 pt-8 max-w-7xl mx-auto relative">
+                <div class="bg-[#101A24] rounded-[2rem] p-12 lg:p-16 text-white flex flex-col md:flex-row justify-between items-center relative overflow-hidden shadow-2xl border border-navy-light">
+                    <div class="max-w-md relative z-10 mb-10 md:mb-0">
+                        <h2 class="text-4xl lg:text-5xl font-extrabold mb-4">Join the <span class="italic text-slate-300">movement.</span></h2>
+                        <p class="text-slate-400 text-lg leading-relaxed">Whether you're just curious or ready to lead a workshop at your school — there's a way in.</p>
+                    </div>
+                    
+                    <div class="flex flex-col gap-3 w-full max-w-sm relative z-10">
+                        <button class="bg-white/5 border border-white/10 hover:bg-white/10 transition flex justify-between items-center py-4 px-6 rounded-2xl font-bold shadow-sm">
+                            <span class="flex items-center gap-3"><i class="fa-solid fa-book-open text-slate-400 w-5"></i> Learn the basics</span>
+                            <i class="fa-solid fa-arrow-right text-slate-400"></i>
+                        </button>
+                        <button class="bg-white/5 border border-white/10 hover:bg-white/10 transition flex justify-between items-center py-4 px-6 rounded-2xl font-bold shadow-sm">
+                            <span class="flex items-center gap-3"><i class="fa-regular fa-newspaper text-slate-400 w-5"></i> Read our articles</span>
+                            <i class="fa-solid fa-arrow-right text-slate-400"></i>
+                        </button>
+                        <button class="bg-white/5 border border-white/10 hover:bg-white/10 transition flex justify-between items-center py-4 px-6 rounded-2xl font-bold shadow-sm">
+                            <span class="flex items-center gap-3"><i class="fa-solid fa-wand-magic-sparkles text-slate-400 w-5"></i> Join a workshop</span>
+                            <i class="fa-solid fa-arrow-right text-slate-400"></i>
+                        </button>
+                        <button class="bg-white/5 border border-white/10 hover:bg-white/10 transition flex justify-between items-center py-4 px-6 rounded-2xl font-bold shadow-sm">
+                            <span class="flex items-center gap-3"><i class="fa-regular fa-calendar text-slate-400 w-5"></i> See upcoming events</span>
+                            <i class="fa-solid fa-arrow-right text-slate-400"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- TAB 2: INFORMATION -->
+        <!-- ========================================== -->
+        <section id="information" class="tab-content hidden min-h-full">
+            <div class="bg-navy pt-24 pb-40 px-12 text-center relative z-0">
+                <h2 class="text-xs font-bold tracking-widest text-slate-400 uppercase mb-4">INFORMATION</h2>
+                <h1 class="text-5xl font-extrabold text-white mb-6">The Basics Explained</h1>
+                <p class="text-slate-300 text-lg max-w-2xl mx-auto relative z-10">Expand each card to go deeper. Slide myth &harr; fact to test your intuition.</p>
+            </div>
+
+            <!-- Custom JS Expandable Cards -->
+            <div class="max-w-4xl mx-auto -mt-24 relative z-30 px-6">
+                <!-- Info Card 1 -->
+                <div class="bg-white rounded-2xl shadow-sm mb-4 overflow-hidden border border-slate-100 js-expand-card">
+                    <div class="p-6 flex flex-col">
+                        <div class="flex items-center gap-4 mb-2">
+                            <div class="w-10 h-10 bg-navy text-white rounded-full flex items-center justify-center shadow-sm"><i class="fa-solid fa-brain"></i></div>
+                            <span class="text-xl font-bold text-navy">AI Literacy</span>
+                        </div>
+                        <div class="card-expanded-content ml-14">
+                            <p class="mb-4 font-semibold text-navy">AI systems learn patterns from huge amounts of data. They don't 'know' facts — they predict what's most likely to come next based on examples.</p>
+                            <p>Large language models are trained to guess the next word. Understanding this framing helps you spot what AI is good at and what it struggles with.</p>
+                        </div>
+                        <button class="js-expand-btn self-end mt-4 text-sm font-bold text-navy flex items-center gap-2 hover:text-slate-500 transition">Read more <i class="fa-solid fa-arrow-right"></i></button>
+                    </div>
+                </div>
+                <!-- Info Card 2 -->
+                <div class="bg-white rounded-2xl shadow-sm mb-4 overflow-hidden border border-slate-100 js-expand-card">
+                    <div class="p-6 flex flex-col">
+                        <div class="flex items-center gap-4 mb-2">
+                            <div class="w-10 h-10 bg-navy text-white rounded-full flex items-center justify-center shadow-sm"><i class="fa-solid fa-shield-halved"></i></div>
+                            <span class="text-xl font-bold text-navy">Responsible Use</span>
+                        </div>
+                        <div class="card-expanded-content ml-14">
+                            <p>Being responsible with AI means being honest about when you use it, careful with private data, and critical of what it tells you.</p>
+                        </div>
+                        <button class="js-expand-btn self-end mt-4 text-sm font-bold text-navy flex items-center gap-2 hover:text-slate-500 transition">Read more <i class="fa-solid fa-arrow-right"></i></button>
+                    </div>
+                </div>
+                <!-- Info Card 3 -->
+                <div class="bg-white rounded-2xl shadow-sm mb-16 overflow-hidden border border-slate-100 js-expand-card">
+                    <div class="p-6 flex flex-col">
+                        <div class="flex items-center gap-4 mb-2">
+                            <div class="w-10 h-10 bg-navy text-white rounded-full flex items-center justify-center shadow-sm"><i class="fa-solid fa-graduation-cap"></i></div>
+                            <span class="text-xl font-bold text-navy">AI in Education</span>
+                        </div>
+                        <div class="card-expanded-content ml-14">
+                            <p>AI is changing homework, grading, and how we learn. That's not automatically good or bad — it depends on how we use it.</p>
+                        </div>
+                        <button class="js-expand-btn self-end mt-4 text-sm font-bold text-navy flex items-center gap-2 hover:text-slate-500 transition">Read more <i class="fa-solid fa-arrow-right"></i></button>
+                    </div>
+                </div>
+
+                <!-- Interactive Myth vs Fact Slider -->
+                <div class="text-center max-w-3xl mx-auto mt-12 bg-white p-10 rounded-3xl shadow-sm border border-slate-100">
+                    <h3 class="text-xs font-bold tracking-widest text-slate-400 uppercase mb-2">MYTH VS. FACT SLIDER</h3>
+                    <h2 class="text-3xl font-extrabold text-navy mb-8">Drag to reveal the truth.</h2>
+                    
+                    <div class="relative w-full h-40 rounded-2xl overflow-hidden shadow-inner mb-8 bg-brand-green">
+                        <div class="absolute inset-0 text-brand-greenText flex items-center justify-center p-8 z-0">
+                            <p class="font-bold text-xl md:text-2xl text-center">FACT: AI models reflect the biases present in their training data.</p>
+                        </div>
+                        <div id="myth-layer" class="absolute inset-0 bg-navy text-white flex items-center justify-center p-8 z-10 transition-opacity duration-75">
+                            <p class="font-bold text-xl md:text-2xl text-center">MYTH: AI is bias free because a computer cannot be biased.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="relative px-2">
+                        <input type="range" id="myth-slider" min="0" max="100" value="0" class="w-full relative z-20">
+                        <div class="flex justify-between text-xs font-bold text-slate-400 uppercase mt-4">
+                            <span>Myth (0%)</span>
+                            <span>Fact (100%)</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- TAB 3: ARTICLES -->
+        <!-- ========================================== -->
+        <section id="articles" class="tab-content hidden min-h-full">
+             <div class="bg-navy pt-24 pb-40 px-12 text-center relative z-0">
+                <h2 class="text-xs font-bold tracking-widest text-slate-400 uppercase mb-4">ARTICLES</h2>
+                <h1 class="text-5xl font-extrabold text-white mb-6">Perspectives on AI, from students.</h1>
+                <p class="text-slate-300 text-lg max-w-2xl mx-auto">Real views on topics we've all been wondering about.</p>
+            </div>
+
+            <div class="max-w-5xl mx-auto -mt-24 relative z-30 px-6 grid grid-cols-1 md:grid-cols-2 gap-8">
+                <!-- Article Card 1 -->
+                <div class="bg-white rounded-3xl p-8 shadow-sm border border-slate-100 flex flex-col hover:shadow-md transition-all js-expand-card">
+                    <div class="flex items-center gap-3 mb-4">
+                        <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-[10px] font-bold tracking-wider uppercase">Ethics</span>
+                        <span class="text-slate-400 text-xs font-medium"><i class="fa-regular fa-clock mr-1"></i> 6 min</span>
+                    </div>
+                    <h3 class="text-2xl font-bold text-navy mb-3 leading-snug">When is using ChatGPT actually cheating?</h3>
+                    <p class="text-slate-500 mb-2">A student's guide to drawing the line between tool and shortcut — with real classroom scenarios.</p>
+                    
+                    <div class="card-expanded-content">
+                        <p class="text-slate-600 text-sm leading-relaxed mb-6">
+                            There's no single rule. What matters is intent, transparency, and the learning objective. If your teacher wants to see your reasoning, AI-generated answers rob you of practice. If the task is drafting or brainstorming, using AI as a partner can be perfectly legitimate — as long as you disclose it and still do the thinking.
+                        </p>
+                    </div>
+                    <button class="js-expand-btn mt-auto self-start pt-4 text-sm font-bold text-navy flex items-center gap-2 hover:text-slate-500 transition">Read more <i class="fa-solid fa-arrow-right"></i></button>
+                </div>
+
+                <!-- Article Card 2 -->
+                <div class="bg-white rounded-3xl p-8 shadow-sm border border-slate-100 flex flex-col hover:shadow-md transition-all js-expand-card">
+                    <div class="flex items-center gap-3 mb-4">
+                        <span class="bg-brand-green text-brand-greenText px-3 py-1 rounded-full text-[10px] font-bold tracking-wider uppercase">Study</span>
+                        <span class="text-slate-400 text-xs font-medium"><i class="fa-regular fa-clock mr-1"></i> 4 min</span>
+                    </div>
+                    <h3 class="text-2xl font-bold text-navy mb-3 leading-snug">5 ways I actually study with AI (that aren't cheating)</h3>
+                    <p class="text-slate-500 mb-2">From flashcard generation to Socratic-style tutoring, here's what works — and what backfires.</p>
+                    
+                    <div class="card-expanded-content">
+                        <p class="text-slate-600 text-sm leading-relaxed mb-6">
+                            1. Turn your notes into practice questions. 2. Ask for a simpler analogy when you're stuck. 3. Have it quiz you and grade your explanations. 4. Get feedback on a rough draft before you polish. 5. Ask 'what am I missing?' after finishing a study session.
+                        </p>
+                    </div>
+                    <button class="js-expand-btn mt-auto self-start pt-4 text-sm font-bold text-navy flex items-center gap-2 hover:text-slate-500 transition">Read more <i class="fa-solid fa-arrow-right"></i></button>
+                </div>
+
+                <!-- Article Card 3 -->
+                <div class="bg-white rounded-3xl p-8 shadow-sm border border-slate-100 flex flex-col hover:shadow-md transition-all js-expand-card">
+                    <div class="flex items-center gap-3 mb-4">
+                        <span class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-[10px] font-bold tracking-wider uppercase">Future</span>
+                        <span class="text-slate-400 text-xs font-medium"><i class="fa-regular fa-clock mr-1"></i> 8 min</span>
+                    </div>
+                    <h3 class="text-2xl font-bold text-navy mb-3 leading-snug">The classroom in 2030</h3>
+                    <p class="text-slate-500 mb-2">Personal tutors, adaptive assessments, and the teachers we'll still need.</p>
+                    
+                    <div class="card-expanded-content">
+                        <p class="text-slate-600 text-sm leading-relaxed mb-6">
+                            The most exciting change isn't automation — it's personalization. Imagine every student getting an AI tutor that knows exactly where they're stuck. The teacher's job shifts from lecturing to mentoring, from grading to guiding.
+                        </p>
+                    </div>
+                    <button class="js-expand-btn mt-auto self-start pt-4 text-sm font-bold text-navy flex items-center gap-2 hover:text-slate-500 transition">Read more <i class="fa-solid fa-arrow-right"></i></button>
+                </div>
+
+                <!-- Article Card 4 -->
+                <div class="bg-white rounded-3xl p-8 shadow-sm border border-slate-100 flex flex-col hover:shadow-md transition-all js-expand-card">
+                    <div class="flex items-center gap-3 mb-4">
+                        <span class="bg-orange-100 text-orange-800 px-3 py-1 rounded-full text-[10px] font-bold tracking-wider uppercase">Bias</span>
+                        <span class="text-slate-400 text-xs font-medium"><i class="fa-regular fa-clock mr-1"></i> 5 min</span>
+                    </div>
+                    <h3 class="text-2xl font-bold text-navy mb-3 leading-snug">Why AI mirrors the internet's blind spots</h3>
+                    <p class="text-slate-500 mb-2">Training data determines behavior. Here's how to spot bias before it fools you.</p>
+                    
+                    <div class="card-expanded-content">
+                        <p class="text-slate-600 text-sm leading-relaxed mb-6">
+                            AI models learn from what's online, and the internet isn't representative of every culture, dialect, or worldview. When you ask a model to describe 'a good student,' notice whose image comes up. Bias detection is now a literacy skill.
+                        </p>
+                    </div>
+                    <button class="js-expand-btn mt-auto self-start pt-4 text-sm font-bold text-navy flex items-center gap-2 hover:text-slate-500 transition">Read more <i class="fa-solid fa-arrow-right"></i></button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- TAB 4: WORKSHOPS -->
+        <!-- ========================================== -->
+        <section id="workshops" class="tab-content hidden min-h-full">
+            <div class="bg-navy pt-24 pb-40 px-12 text-center relative z-0">
+                <h2 class="text-xs font-bold tracking-widest text-slate-400 uppercase mb-4">WORKSHOPS</h2>
+                <h1 class="text-5xl font-extrabold text-white mb-6">Learn by doing.</h1>
+                <p class="text-slate-300 text-lg max-w-2xl mx-auto">Interactive sessions we run for schools. Book one — or try the questions below.</p>
+            </div>
+
+            <div class="max-w-5xl mx-auto -mt-24 relative z-30 px-6 grid grid-cols-1 md:grid-cols-2 gap-8 mb-24">
+                <div class="bg-white rounded-3xl p-8 shadow-sm border border-slate-100 flex flex-col items-start h-full hover:shadow-md transition">
+                    <div class="flex items-center gap-2 mb-4">
+                        <span class="bg-navy text-white px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider">Beginner</span>
+                        <span class="bg-brand-green text-brand-greenText px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider">45 min</span>
+                    </div>
+                    <h3 class="text-2xl font-bold text-navy mb-3">Prompting 101</h3>
+                    <p class="text-slate-500 mb-8 flex-grow">The anatomy of a great prompt, plus five patterns you'll use forever.</p>
+                    <button class="bg-navy text-white text-xs font-bold px-6 py-3 rounded-full hover:bg-navy-light transition shadow-sm">Coming Soon</button>
+                </div>
+                <div class="bg-white rounded-3xl p-8 shadow-sm border border-slate-100 flex flex-col items-start h-full hover:shadow-md transition">
+                    <div class="flex items-center gap-2 mb-4">
+                        <span class="bg-navy text-white px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider">Intermediate</span>
+                        <span class="bg-slate-100 text-slate-600 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider">60 min</span>
+                    </div>
+                    <h3 class="text-2xl font-bold text-navy mb-3">Spotting AI Hallucinations</h3>
+                    <p class="text-slate-500 mb-8 flex-grow">Practice catching confident nonsense with real examples from popular models.</p>
+                    <button class="bg-navy text-white text-xs font-bold px-6 py-3 rounded-full hover:bg-navy-light transition shadow-sm">Coming Soon</button>
+                </div>
+            </div>
+
+            <div class="max-w-3xl mx-auto px-6 text-center relative border-t border-slate-200 pt-16 pb-16">
+                <h2 class="text-xs font-bold tracking-widest text-slate-400 uppercase mb-2 relative z-10">SCENARIO QUIZ</h2>
+                <h3 class="text-3xl font-extrabold text-navy mb-8 relative z-10">Try a taster.</h3>
+
+                <div class="bg-white p-10 rounded-3xl shadow-sm border border-slate-100 text-left relative z-10">
+                    <p class="font-bold text-navy text-xl mb-6">Your teacher says you can 'use AI to help outline' an essay. What's the best move?</p>
+                    
+                    <div class="space-y-4">
+                        <label class="flex items-center p-5 border-2 border-slate-100 rounded-2xl hover:border-navy cursor-pointer transition-colors group">
+                            <input type="radio" name="quiz" class="w-5 h-5 accent-navy mr-4">
+                            <span class="text-slate-600 font-medium group-hover:text-navy">Paste the prompt, submit the AI's essay.</span>
+                        </label>
+                        <label class="flex items-center p-5 border-2 border-slate-100 rounded-2xl hover:border-navy cursor-pointer transition-colors group">
+                            <input type="radio" name="quiz" class="w-5 h-5 accent-navy mr-4" checked>
+                            <span class="text-slate-600 font-medium group-hover:text-navy">Ask AI for 3 outline options, then pick and rewrite in your own words.</span>
+                        </label>
+                        <label class="flex items-center p-5 border-2 border-slate-100 rounded-2xl hover:border-navy cursor-pointer transition-colors group">
+                            <input type="radio" name="quiz" class="w-5 h-5 accent-navy mr-4">
+                            <span class="text-slate-600 font-medium group-hover:text-navy">Avoid AI entirely to be safe.</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- TAB 5: EVENTS -->
+        <!-- ========================================== -->
+        <section id="events" class="tab-content hidden min-h-full">
+            <div class="bg-navy pt-24 pb-40 px-12 text-center relative z-0">
+                <h2 class="text-xs font-bold tracking-widest text-slate-400 uppercase mb-4">EVENTS</h2>
+                <h1 class="text-5xl font-extrabold text-white mb-6">All work, no play...</h1>
+                <p class="text-slate-300 text-lg max-w-2xl mx-auto">A live timeline of what's coming up. All events are free for students.</p>
+            </div>
+
+            <div class="max-w-4xl mx-auto px-6 -mt-16 relative z-30">
+                <div class="relative border-l-4 border-slate-200 ml-4 md:ml-10 space-y-8 pb-10">
+                    <div class="relative pl-8 md:pl-16">
+                        <div class="absolute -left-[14px] top-8 w-6 h-6 bg-navy rounded-full border-4 border-white shadow-sm"></div>
+                        <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-100 flex flex-col items-start relative z-10 hover:shadow-md transition">
+                            <div class="flex items-center gap-2 mb-4">
+                                <span class="bg-navy text-white px-3 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider"><i class="fa-regular fa-calendar mr-1"></i> Sep 12</span>
+                                <span class="bg-slate-100 text-slate-600 px-3 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider"><i class="fa-solid fa-location-dot mr-1"></i> Online</span>
+                            </div>
+                            <h3 class="text-2xl font-bold text-navy mb-2">Beyond the Prompt Launch Night</h3>
+                            <p class="text-slate-500 mb-6">Founders' story, live demo, community Q&A.</p>
+                            <button class="bg-navy text-white text-xs font-bold px-6 py-3 rounded-full hover:bg-navy-light transition shadow-sm">Coming Soon</button>
+                        </div>
+                    </div>
+                    <div class="relative pl-8 md:pl-16">
+                        <div class="absolute -left-[14px] top-8 w-6 h-6 bg-navy rounded-full border-4 border-white shadow-sm"></div>
+                        <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-100 flex flex-col items-start relative z-10 hover:shadow-md transition">
+                            <div class="flex items-center gap-2 mb-4">
+                                <span class="bg-navy text-white px-3 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider"><i class="fa-regular fa-calendar mr-1"></i> Oct 04</span>
+                                <span class="bg-brand-green text-brand-greenText px-3 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider"><i class="fa-solid fa-location-dot mr-1"></i> London</span>
+                            </div>
+                            <h3 class="text-2xl font-bold text-navy mb-2">AI Ethics Roundtable</h3>
+                            <p class="text-slate-500 mb-6">Students, teachers, and researchers unpack real classroom dilemmas.</p>
+                            <button class="bg-navy text-white text-xs font-bold px-6 py-3 rounded-full hover:bg-navy-light transition shadow-sm">Coming Soon</button>
+                        </div>
+                    </div>
+                    <div class="relative pl-8 md:pl-16">
+                        <div class="absolute -left-[14px] top-8 w-6 h-6 bg-navy rounded-full border-4 border-white shadow-sm"></div>
+                        <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-100 flex flex-col items-start relative z-10 hover:shadow-md transition">
+                            <div class="flex items-center gap-2 mb-4">
+                                <span class="bg-navy text-white px-3 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider"><i class="fa-regular fa-calendar mr-1"></i> Nov 18</span>
+                                <span class="bg-blue-100 text-blue-800 px-3 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider"><i class="fa-solid fa-location-dot mr-1"></i> Hybrid</span>
+                            </div>
+                            <h3 class="text-2xl font-bold text-navy mb-2">Student AI Hackathon</h3>
+                            <p class="text-slate-500 mb-6">48 hours to prototype a learning tool. Prizes, mentors, snacks.</p>
+                            <button class="bg-navy text-white text-xs font-bold px-6 py-3 rounded-full hover:bg-navy-light transition shadow-sm">Coming Soon</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- TAB 6: ABOUT US -->
+        <!-- ========================================== -->
+        <section id="about" class="tab-content hidden min-h-full">
+            <div class="bg-navy pt-24 pb-48 px-12 text-center relative z-0">
+                <h2 class="text-xs font-bold tracking-widest text-slate-400 uppercase mb-4">ABOUT US</h2>
+                <h1 class="text-5xl font-extrabold text-white mb-6">Built by students, for students.</h1>
+                <p class="text-slate-300 text-lg max-w-2xl mx-auto">Beyond The Prompt didn't start with some grand declaration. It started small - in the hearts of people willing to make a difference. Come meet your Beyonders!</p>
+            </div>
+
+            <div class="max-w-6xl mx-auto -mt-32 relative z-30 px-6 grid grid-cols-1 md:grid-cols-3 gap-6 mb-24">
+                <div class="bg-white p-10 rounded-3xl shadow-sm border border-slate-100 text-left relative z-10 hover:-translate-y-1 transition-transform">
+                    <div class="w-12 h-12 bg-[#F0F4F8] rounded-2xl flex items-center justify-center text-navy mb-6 text-xl"><i class="fa-regular fa-heart"></i></div>
+                    <h3 class="font-bold text-navy text-xl mb-3">Student-first</h3>
+                    <p class="text-slate-500 text-sm leading-relaxed">Every workshop, article, and event is designed with — and for — students.</p>
+                </div>
+                <div class="bg-white p-10 rounded-3xl shadow-sm border border-slate-100 text-left relative z-10 hover:-translate-y-1 transition-transform">
+                    <div class="w-12 h-12 bg-[#F0F4F8] rounded-2xl flex items-center justify-center text-navy mb-6 text-xl"><i class="fa-solid fa-wand-magic-sparkles"></i></div>
+                    <h3 class="font-bold text-navy text-xl mb-3">Curious & honest</h3>
+                    <p class="text-slate-500 text-sm leading-relaxed">We don't hype AI. We don't fear it either. We ask questions and check our work.</p>
+                </div>
+                <div class="bg-white p-10 rounded-3xl shadow-sm border border-slate-100 text-left relative z-10 hover:-translate-y-1 transition-transform">
+                    <div class="w-12 h-12 bg-[#F0F4F8] rounded-2xl flex items-center justify-center text-navy mb-6 text-xl"><i class="fa-solid fa-user-group"></i></div>
+                    <h3 class="font-bold text-navy text-xl mb-3">Community-powered</h3>
+                    <p class="text-slate-500 text-sm leading-relaxed">We grow through partner schools, volunteers, and everyone who shows up to learn.</p>
+                </div>
+            </div>
+
+            <!-- Team Section -->
+            <div class="max-w-6xl mx-auto px-6 mb-24 mt-16 border-t border-slate-200 pt-16">
+                <div class="text-center mb-12">
+                    <h2 class="text-xs font-bold tracking-widest text-slate-400 uppercase mb-2">THE TEAM</h2>
+                    <h3 class="text-4xl font-extrabold text-navy">Students running the show.</h3>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-100 flex items-start gap-6 hover:shadow-md transition">
+                        <div class="w-20 h-20 flex-shrink-0 bg-brand-blue text-brand-blueText font-extrabold text-3xl rounded-2xl flex items-center justify-center shadow-inner border border-blue-200">H</div>
+                        <div>
+                            <h4 class="text-2xl font-bold text-navy mb-1">Hallow</h4>
+                            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-4">FOUNDER • AKA BASE</p>
+                            <p class="text-sm text-slate-500 leading-relaxed">Started Beyond the Prompt after noticing how differently students and teachers talk about AI.</p>
+                        </div>
+                    </div>
+                    <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-100 flex items-start gap-6 hover:shadow-md transition">
+                        <div class="w-20 h-20 flex-shrink-0 bg-brand-blue text-brand-blueText font-extrabold text-3xl rounded-2xl flex items-center justify-center shadow-inner border border-blue-200">R</div>
+                        <div>
+                            <h4 class="text-2xl font-bold text-navy mb-1">Ryo</h4>
+                            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-4">WORKSHOPS LEAD • 11TH GRADE</p>
+                            <p class="text-sm text-slate-500 leading-relaxed">Designs and runs our in-school sessions. Believes the fastest way to understand a tool is to break it on purpose.</p>
+                        </div>
+                    </div>
+                    <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-100 flex items-start gap-6 hover:shadow-md transition">
+                        <div class="w-20 h-20 flex-shrink-0 bg-brand-blue text-brand-blueText font-extrabold text-3xl rounded-2xl flex items-center justify-center shadow-inner border border-blue-200">P</div>
+                        <div>
+                            <h4 class="text-2xl font-bold text-navy mb-1">Priya</h4>
+                            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-4">EDITOR • 12TH GRADE</p>
+                            <p class="text-sm text-slate-500 leading-relaxed">Edits every article that goes out, chasing clarity over cleverness. Especially interested in how bias sneaks into models.</p>
+                        </div>
+                    </div>
+                    <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-100 flex items-start gap-6 hover:shadow-md transition">
+                        <div class="w-20 h-20 flex-shrink-0 bg-brand-blue text-brand-blueText font-extrabold text-3xl rounded-2xl flex items-center justify-center shadow-inner border border-blue-200">D</div>
+                        <div>
+                            <h4 class="text-2xl font-bold text-navy mb-1">Diego</h4>
+                            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-4">EVENTS LEAD • 10TH GRADE</p>
+                            <p class="text-sm text-slate-500 leading-relaxed">Plans the roundtables, hackathons, and launch nights. Handles the logistics nobody sees.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer CTA Banner -->
+            <div class="max-w-5xl mx-auto px-6 mb-12">
+                <div class="bg-navy rounded-[2rem] p-12 text-white flex flex-col md:flex-row items-center justify-between gap-8 shadow-xl relative overflow-hidden border border-navy-light">
+                    <div class="max-w-md relative z-10">
+                        <h2 class="text-3xl font-extrabold mb-3">Get involved</h2>
+                        <p class="text-slate-300">Volunteer, sponsor a workshop, or bring us to your school. There's a way in for everyone.</p>
+                    </div>
+                    <div class="w-full md:w-auto flex flex-col gap-3 relative z-10">
+                        <div class="relative">
+                            <input type="email" placeholder="Email the team" class="w-full md:w-80 bg-[#2a364f] border border-[#3b4b6b] text-white rounded-xl py-4 px-5 outline-none focus:border-white transition placeholder:text-slate-400">
+                            <i class="fa-solid fa-arrow-right absolute right-5 top-5 text-slate-400"></i>
+                        </div>
+                        <button class="w-full md:w-80 bg-white text-navy font-bold rounded-xl py-4 px-5 hover:bg-slate-100 transition shadow-sm">
+                            See what's coming up
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="text-center mt-12 pb-16">
+                <h2 class="text-3xl font-extrabold text-navy">Join the movement.</h2>
+            </div>
+        </section>
+        
+        <!-- Fixed Mascot Element in the bottom right corner -->
+        <img src="Bird.png" alt="Floating Bird Mascot" class="fixed bottom-6 right-8 w-20 h-20 object-contain hover:-translate-y-2 transition-transform cursor-pointer z-50 drop-shadow-lg">
+
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- Navigation Logic ---
+            const navLinks = document.querySelectorAll('.nav-link');
+            const tabContents = document.querySelectorAll('.tab-content');
+            const mainContainer = document.querySelector('main');
+
+            navLinks.forEach(link => {
+                link.addEventListener('click', () => {
+                    const targetId = link.getAttribute('data-target');
+                    
+                    // Toggle visibility of sections
+                    tabContents.forEach(tab => {
+                        if(tab.id === targetId) {
+                            tab.classList.remove('hidden');
+                            tab.classList.add('block');
+                        } else {
+                            tab.classList.add('hidden');
+                            tab.classList.remove('block');
+                        }
+                    });
+
+                    // Update active state styling on buttons
+                    navLinks.forEach(nav => {
+                        nav.className = 'nav-link w-full flex items-center gap-4 px-5 py-3.5 rounded-full text-slate-300 hover:text-white hover:bg-white/10 font-semibold transition-all';
+                    });
+                    
+                    link.className = 'nav-link active w-full flex items-center gap-4 px-5 py-3.5 rounded-full bg-white text-navy font-bold shadow-md transition-all';
+                    
+                    // Scroll to top of main container
+                    mainContainer.scrollTo({ top: 0, behavior: 'smooth' });
+                });
+            });
+
+            // --- Interactive Myth vs Fact Slider Logic ---
+            const slider = document.getElementById('myth-slider');
+            const mythLayer = document.getElementById('myth-layer');
+
+            if (slider && mythLayer) {
+                slider.addEventListener('input', (e) => {
+                    const val = e.target.value;
+                    const opacityValue = 1 - (val / 100);
+                    mythLayer.style.opacity = opacityValue;
+                });
+            }
+
+            // --- Expanding Cards Logic (Information & Articles) ---
+            const expandableCards = document.querySelectorAll('.js-expand-card');
+            
+            expandableCards.forEach(card => {
+                const btn = card.querySelector('.js-expand-btn');
+                if(!btn) return;
+
+                btn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const content = card.querySelector('.card-expanded-content');
+                    
+                    if(content.classList.contains('active')) {
+                        // Collapse
+                        content.classList.remove('active');
+                        btn.innerHTML = 'Read more <i class="fa-solid fa-arrow-right"></i>';
+                    } else {
+                        // Expand
+                        content.classList.add('active');
+                        btn.innerHTML = 'Close <i class="fa-solid fa-arrow-right"></i>';
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
